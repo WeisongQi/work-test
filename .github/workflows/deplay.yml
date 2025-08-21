@@ -10,7 +10,8 @@ jobs:
         uses: actions/checkout@v5
 
       - name: ssh setup
-        run: mkdir -p ~/.ssh
+        run: |
+          mkdir -p ~/.ssh
           echo "${{secrets.EC2_P_KEY}}" > ~/.ssh/meinPrivateKey
           chmod 400 ~/.ssh/meinPrivateKey
           ssh-keyscan -H ${{secrets.EC2_IP}}  >> ~/.ssh/known_hosts
