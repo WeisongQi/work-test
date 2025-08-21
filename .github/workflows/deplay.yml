@@ -22,12 +22,11 @@ jobs:
 
       - name: Copy info.txt to EC2
         run: |
-          scp -i ~/.ssh/meinPrivateKey work-test/info.txt ubuntu@${{ secrets.EC2_IP }}:~/work-test/info.txt
+          scp -i ~/.ssh/meinPrivateKey ~/work-test/info.txt ubuntu@${{ secrets.EC2_IP }}:~/work-test/info.txt
 
       - name: Verify info.txt on EC2
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} \
-              "ls -l ~/work-test && head -n1 ~/work-test/info.txt"
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} "ls -l ~/work-test && head -n1 ~/work-test/info.txt"
 
       - name: install nginx
         run: |
