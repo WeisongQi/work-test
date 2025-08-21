@@ -1,0 +1,43 @@
+name: Kombinierter Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  meinErsterJob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: meinErsterSchritt
+        run: echo "Hello World"
+
+  meinZweiterJob:
+    needs: meinErsterJob
+    runs-on: ubuntu-latest
+    steps:
+      - name: meinZweiterSchritt
+        run: date
+
+  # remoteDeploy:
+  #   needs: meinZweiterJob
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup SSH Key
+  #       run: |
+  #         mkdir -p ~/.ssh
+  #         echo "${{ secrets.KEYSSHGOOGLE }}" > ~/.ssh/id_rsa
+  #         chmod 600 ~/.ssh/id_rsa
+  #         ssh-keyscan -H>> ~/.ssh/known_hosts
+
+  #     - name: Remote Deployment
+  #       run: |
+  #         << 'EOF'
+  #           echo "✅ SSH 连接成功！"
+  #           uname -a
+  #           date > date.txt
+  #           whoami
+  #        EOF
