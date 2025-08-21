@@ -35,12 +35,12 @@ jobs:
 
       - name: Install cowsay on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} \
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} \
             "sudo apt update -y && sudo apt install -y cowsay"
 
       - name: Run cowsay on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} \
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} \
             'cowsay "Hallo aus den GitHub Actions"'
 
     #   - name: SSH Connection
