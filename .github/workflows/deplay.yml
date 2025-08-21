@@ -18,15 +18,15 @@ jobs:
 
       - name: Create work-test on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} "mkdir -p ~/work-test"
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} "mkdir -p ~/work-test"
 
       - name: Copy info.txt to EC2
         run: |
-          scp -i ~/.ssh/id_rsa work-test/info.txt ubuntu@${{ secrets.EC2_IP }}:~/work-test/info.txt
+          scp -i ~/.ssh/meinPrivateKey work-test/info.txt ubuntu@${{ secrets.EC2_IP }}:~/work-test/info.txt
 
       - name: Verify info.txt on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} \
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{ secrets.EC2_IP }} \
               "ls -l ~/work-test && head -n1 ~/work-test/info.txt"
 
       - name: install nginx
