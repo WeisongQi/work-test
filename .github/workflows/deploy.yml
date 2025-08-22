@@ -16,16 +16,32 @@ jobs:
           chmod 400 ~/.ssh/meinPrivateKey
           ssh-keyscan -H ${{secrets.EC2_IP}} >> ~/.ssh/known_hosts
 
+      - name: Create Frontend Directory
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "mkdir -p /home/ubuntu/frontend"
+
       - name: Deploy Frontend Files
         run: |
-          scp -i ~/.ssh/meinPrivateKey -r frontend/* ubuntu@${{secrets.EC2_IP}}:/home/ubuntu/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/* ubuntu@${{secrets.EC2_IP}}:/home/ubuntu/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ubuntu@${{secrets.EC2_IP}}:/home/ubuntu/frontend/
 
       - name: Deploy Docker Container
         run: |
           ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
             cd /home/ubuntu/frontend && \
-            sudo docker build -t frontend-image . && \
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update && \
+              sudo apt-get install -y docker.io
+            fi && \
+            sudo systemctl start docker && \
+            sudo docker build --no-cache -t frontend-image . && \
             sudo docker stop mein-frontend-container || true && \
             sudo docker rm mein-frontend-container || true && \
             sudo docker run -d --name mein-frontend-container -p 8081:80 frontend-image
+          "
+
+      - name: Verify Container
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
+            sudo docker ps | grep mein-frontend-container
           "
