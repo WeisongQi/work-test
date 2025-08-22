@@ -1,0 +1,32 @@
+name: Restart Docker Container
+
+on:
+  workflow_dispatch:
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: SSH setup
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{secrets.EC2_P_KEY}}" > ~/.ssh/meinPrivateKey
+          chmod 400 ~/.ssh/meinPrivateKey
+          ssh-keyscan -H ${{secrets.EC2_IP}} >> ~/.ssh/known_hosts
+
+      - name: Stop and remove existing container
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
+            docker stop mein-frontend-container || true
+            docker rm mein-frontend-container || true
+          "
+
+      - name: Start new container
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
+            docker run -d --name mein-frontend-container -p 8081:80 frontend-image
+          "
