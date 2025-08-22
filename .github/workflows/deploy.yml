@@ -40,8 +40,16 @@ jobs:
             sudo docker run -d --name mein-frontend-container -p 8081:80 frontend-image
           "
 
+      - name: Wait for Container Startup
+        run: sleep 20
+
       - name: Verify Container
         run: |
           ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
-            sudo docker ps | grep mein-frontend-container
+            echo '=== Docker Container Status ===' && \
+            sudo docker ps | grep mein-frontend-container && \
+            echo '=== Container Logs ===' && \
+            sudo docker logs mein-frontend-container && \
+            echo '=== Application URL ===' && \
+            echo 'Your application is now available at: http://${{secrets.EC2_IP}}:8081'
           "
