@@ -18,17 +18,17 @@ jobs:
 
       - name: Create Frontend Directory
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "mkdir -p /home/${{vars.YONGHU}}/frontend"
+          ssh -i ~/.ssh/meinPrivateKey ${{secrets.G_YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "mkdir -p /home/${{secrets.G_YONGHU}}/frontend"
 
       - name: Deploy Frontend Files
         run: |
-          scp -i ~/.ssh/meinPrivateKey frontend/* ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
-          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/* ${{secrets.G_YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{secrets.G_YONGHU}}/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{secrets.G_YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{secrets.G_YONGHU}}/frontend/
 
       - name: Deploy Docker Container
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
-            cd /home/${{vars.YONGHU}}/frontend && \
+          ssh -i ~/.ssh/meinPrivateKey ${{secrets.G_YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
+            cd /home/${{secrets.G_YONGHU}}/frontend && \
             if ! command -v docker &> /dev/null; then
               sudo apt-get update && \
               sudo apt-get install -y docker.io
@@ -45,7 +45,7 @@ jobs:
 
       - name: Verify Container
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
+          ssh -i ~/.ssh/meinPrivateKey ${{secrets.G_YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
             echo '=== Docker Container Status ===' && \
             sudo docker ps | grep mein-frontend-container && \
             echo '=== Container Logs ===' && \
