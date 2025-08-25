@@ -22,13 +22,13 @@ jobs:
 
       - name: Deploy Frontend Files
         run: |
-          scp -i ~/.ssh/meinPrivateKey frontend/* ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/ubuntu/frontend/
-          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/ubuntu/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/* ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
 
       - name: Deploy Docker Container
         run: |
           ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
-            cd /home/${{vars.YONGHU}}ubuntu/frontend && \
+            cd /home/${{vars.YONGHU}}/frontend && \
             if ! command -v docker &> /dev/null; then
               sudo apt-get update && \
               sudo apt-get install -y docker.io
