@@ -12,23 +12,23 @@ jobs:
       - name: SSH Setup
         run: |
           mkdir -p ~/.ssh
-          echo "${{secrets.KEYSSHGOOGLE}}" > ~/.ssh/meinPrivateKey
+          echo "${{secrets.EC2_P_KEY}}" > ~/.ssh/meinPrivateKey
           chmod 400 ~/.ssh/meinPrivateKey
-          ssh-keyscan -H ${{secrets.G_CLOUD_DONG_IP}} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{secrets.EC2_IP}} >> ~/.ssh/known_hosts
 
       - name: Create Frontend Directory
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "mkdir -p /home/${{vars.YONGHU}}/frontend"
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "mkdir -p /home/ubuntu/frontend"
 
       - name: Deploy Frontend Files
         run: |
-          scp -i ~/.ssh/meinPrivateKey frontend/* ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
-          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/* ubuntu@${{secrets.EC2_IP}}:/home/ubuntu/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ubuntu@${{secrets.EC2_IP}}:/home/ubuntu/frontend/
 
       - name: Deploy Docker Container
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
-            cd /home/${{vars.YONGHU}}/frontend && \
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
+            cd /home/ubuntu/frontend && \
             if ! command -v docker &> /dev/null; then
               sudo apt-get update && \
               sudo apt-get install -y docker.io
@@ -45,11 +45,11 @@ jobs:
 
       - name: Verify Container
         run: |
-          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
+          ssh -i ~/.ssh/meinPrivateKey ubuntu@${{secrets.EC2_IP}} "
             echo '=== Docker Container Status ===' && \
             sudo docker ps | grep mein-frontend-container && \
             echo '=== Container Logs ===' && \
             sudo docker logs mein-frontend-container && \
             echo '=== Application URL ===' && \
-            echo 'Your application is now available at: http://${{secrets.G_CLOUD_DONG_IP}}:8081'
+            echo 'Your application is now available at: http://${{secrets.EC2_IP}}:8081'
           "
