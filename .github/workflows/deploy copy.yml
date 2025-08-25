@@ -1,0 +1,55 @@
+name: DeployWorkflow
+
+on: push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: SSH Setup
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{secrets.KEYSSHGOOGLE}}" > ~/.ssh/meinPrivateKey
+          chmod 400 ~/.ssh/meinPrivateKey
+          ssh-keyscan -H ${{secrets.G_CLOUD_DONG_IP}} >> ~/.ssh/known_hosts
+
+      - name: Create Frontend Directory
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "mkdir -p /home/${{vars.YONGHU}}/frontend"
+
+      - name: Deploy Frontend Files
+        run: |
+          scp -i ~/.ssh/meinPrivateKey frontend/* ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
+          scp -i ~/.ssh/meinPrivateKey frontend/Dockerfile ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}}:/home/${{vars.YONGHU}}/frontend/
+
+      - name: Deploy Docker Container
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
+            cd /home/${{vars.YONGHU}}/frontend && \
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update && \
+              sudo apt-get install -y docker.io
+            fi && \
+            sudo systemctl start docker && \
+            sudo docker build --no-cache -t frontend-image . && \
+            sudo docker stop mein-frontend-container || true && \
+            sudo docker rm mein-frontend-container || true && \
+            sudo docker run -d --name mein-frontend-container -p 8081:80 frontend-image
+          "
+
+      - name: Wait for Container Startup
+        run: sleep 20
+
+      - name: Verify Container
+        run: |
+          ssh -i ~/.ssh/meinPrivateKey ${{vars.YONGHU}}@${{secrets.G_CLOUD_DONG_IP}} "
+            echo '=== Docker Container Status ===' && \
+            sudo docker ps | grep mein-frontend-container && \
+            echo '=== Container Logs ===' && \
+            sudo docker logs mein-frontend-container && \
+            echo '=== Application URL ===' && \
+            echo 'Your application is now available at: http://${{secrets.G_CLOUD_DONG_IP}}:8081'
+          "
